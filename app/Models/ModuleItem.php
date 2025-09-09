@@ -17,6 +17,10 @@ class ModuleItem extends Model
         'type',
     ];
 
+    protected $casts = [
+        'content' => 'array',
+    ];
+
     public function module()
     {
         return $this->belongsTo(Module::class);

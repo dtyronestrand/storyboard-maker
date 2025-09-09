@@ -20,7 +20,7 @@ class ModuleItemController extends Controller
         $module->items()->create([
             'type' => $request->type,
             'title' => $request->input('data.title'),
-            'content' => json_encode($request->data),
+            'content' => $request->data,
             'order' => $module->items()->count() + 1,
         ]);
 
