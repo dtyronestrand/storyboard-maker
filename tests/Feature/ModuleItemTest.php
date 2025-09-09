@@ -20,8 +20,10 @@ class ModuleItemTest extends TestCase
         $module = Module::factory()->create(['course_id' => $course->id]);
 
         $response = $this->actingAs($user)->post(route('modules.items.store', $module), [
-            'title' => 'New Module Item',
             'type' => 'overview',
+            'data' => [
+                'title' => 'New Module Item',
+            ]
         ]);
 
         $response->assertRedirect();

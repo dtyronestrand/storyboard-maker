@@ -12,11 +12,15 @@ class ModuleItemController extends Controller
     public function store(Request $request, Module $module)
     {
         $request->validate([
-            'title' => 'required|string|max:255',
+            'type' => 'required|string',
+            'data' => 'required|array',
+            'data.title' => 'required|string|max:255',
         ]);
 
         $module->items()->create([
-            'title' => $request->title,
+            'type' => $request->type,
+            'title' => $request->input('data.title'),
+            'content' => json_encode($request->data),
             'order' => $module->items()->count() + 1,
         ]);
 

@@ -17,6 +17,7 @@ class ModuleItemFactory extends Factory
             'title' => $this->faker->sentence,
             'order' => $this->faker->randomNumber(2),
             'content' => $this->faker->paragraph,
+            'type' => 'overview',
         ];
     }
 }

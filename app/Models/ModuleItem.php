@@ -14,5 +14,11 @@ class ModuleItem extends Model
         'content',
         'order',
         'module_id',
+        'type',
     ];
+
+    public function module()
+    {
+        return $this->belongsTo(Module::class);
+    }
 }
