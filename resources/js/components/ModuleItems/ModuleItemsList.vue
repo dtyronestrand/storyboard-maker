@@ -1,9 +1,11 @@
 <template>
     <div>
-        <draggable v-model="localItems" item-key="id" animation="200" handle=".drag-handle">
-         <div v-for ="(item, index) in localItems" :key="item.id" class="mb-4">
+        <draggable v-model="localItems" item-key="id" animation="200" handle=".drag-handle" @end="handleReorder">
+         <template #item="{element: item, index}">
+         <div class="mb-4">
             <ModuleItem :item="item" :index="index" @update="handleUpdateItem" @delete="handleDeleteItem"/>
             </div>
+         </template>
         </draggable>
         <div class="mt-4">
         <select @change="e=>handleAddItem(e.target.value)">
@@ -11,16 +13,12 @@
         <option v-for="type in itemTypes" :key="type.value" :value="type.value">{{type.label}}</option>
         </select>
         </div>
-        <div class="mt-8">
-        <button @click="saveChanges" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Save Changes</button>
-        </div>
     </div>
 </template>
 
 <script setup lang="ts">
 import {ref} from 'vue';
 import {router} from "@inertiajs/vue3";
-import {v4 as uuidv4} from 'uuid';
 import { VueDraggableNext as draggable } from 'vue-draggable-next';
 import ModuleItem from './ModuleItem.vue';
 
@@ -40,7 +38,7 @@ const itemTypes = [
 ]
 
 function createItemScaffold(type){
-    const base = {id: uuidv4(), type: type, data: {}};
+    const base = {type: type, data: {}};
     switch(type){
         case 'overview':
             base.data ={title: `Module `, content: '', learning_objectives: [] };
@@ -65,23 +63,40 @@ function createItemScaffold(type){
 }
 function handleAddItem(type){
     const newItem = createItemScaffold(type);
-    localItems.value.push(newItem);
+    router.post(`/modules/${props.module.id}/items`, {
+        ...newItem
+    }, {
+        preserveScroll: true,
+        onSuccess: () => {
+            // Note: The page will reload, so we don't need to update localItems manually.
+        }
+    });
 }
+
 function handleUpdateItem(updatedItem){
-    const index = localItems.value.findIndex(item => item.id === updatedItem.id);
-    if (index !== -1){
-        localItems.value[index] = updatedItem;
-    }
+    router.put(`/items/${updatedItem.id}`, {
+        ...updatedItem.data
+    }, {
+        preserveScroll: true
+    });
 }
 
 function handleDeleteItem(itemId){
-    localItems.value = localItems.value.filter(item => item.id !== itemId);
+    router.delete(`/items/${itemId}`, {
+        preserveScroll: true
+    });
 }
 
-function saveChanges(){
-    router.put(`/modules/${props.module.id}/items`, {
-        module: props.module.id,
-        items: localItems.value
+function handleReorder() {
+    const orderedItems = localItems.value.map((item, index) => {
+        return {
+            id: item.id,
+            order: index + 1
+        };
+    });
+
+    router.post(`/modules/${props.module.id}/items/reorder`, {
+        items: orderedItems
     }, {
         preserveScroll: true
     });
