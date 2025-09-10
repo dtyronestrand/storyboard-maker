@@ -25,7 +25,7 @@ Route::delete('modules/{module}/items/{itemId}', [ModuleItemController::class, '
 Route::delete('modules/{module}/items/{itemId}', [ModuleItemController::class, 'destroy'])->middleware(['auth', 'verified'])->name('modules.items.destroy');    
 
 Route::get('/google/redirect', [\App\Http\Controllers\StoryboardController::class, 'redirectToGoogle'])->name('google.redirect');
-Route::get('/google/callback', [\App\Http\Controllers\StoryboardController::class, 'handleGoogleCallback'])->name('google.callback');
+Route::get('/google/login/callback', [\App\Http\Controllers\StoryboardController::class, 'handleGoogleCallback'])->name('google.callback');
 Route::post('/storyboard/export/{course}', [\App\Http\Controllers\StoryboardController::class, 'exportToGoogleDocs'])->name('storyboard.export');
 
 require __DIR__.'/settings.php';
