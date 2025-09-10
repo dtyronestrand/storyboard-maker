@@ -1,51 +1,65 @@
 <template>
-    <div class="space-y-4">
+    <div class="space-y-4 bg-base-300">
     <div>
     <label>Title</label>
-    <input type="text" v-model="editableData.data.title" class="w-full border p-2 rounded"/>
+    <input type="text" v-model="editableData.title" class="w-full border border-accent bg-base-100 p-2 rounded"/>
     </div>
     <div>
     <label>Content</label>
-    <div class="border rounded">
-    <editor-content :editor="editor"/>
+    <div class="border border-accent rounded">
+<TipTap v-model="editableData.content"/>
+    </div>
     </div>
 
-    </div>
+    
   <div class="flex gap-2">
-            <button @click="save" class="px-3 py-1 rounded btn btn-success">Save</button>
+            <button @click="save" :disabled="saving" class="px-3 py-1 rounded btn btn-success">
+                {{ saving ? 'Saving...' : 'Save' }}
+            </button>
             <button @click="$emit('cancel')" class="px-3 py-1 rounded btn btn-error">Cancel</button>
         </div>
     </div>
+
 </template>
 
 <script setup lang="ts">
-import {ref} from 'vue';
-import {useEditor, EditorContent} from '@tiptap/vue-3';
-import StarterKit from '@tiptap/starter-kit';
+import {ref, onMounted, onBeforeUnmount} from 'vue';
+import {router} from '@inertiajs/vue3';
 
+import TipTap from '@/components/TipTap.vue';
 const props = defineProps({
-    itemData: Object
+    itemData: Object,
+    itemId: String,
+    moduleId: Number,
+    edit: {type: Boolean, default: false}
 });
 
 const emit = defineEmits(['save', 'cancel']);
 
 const editableData = ref({...props.itemData});
-
-const editor = useEditor({
-    content: editableData.value.data.content,
-    extensions: [
-        StarterKit,
-    ],
-    onUpdate({ editor }) {
-        editableData.value.data.content = editor.getHTML();
-    }
-})
+const saving = ref(false);
 
 function save() {
-    emit('save', editableData.value);
+    if (props.moduleId && props.itemId) {
+        saving.value = true;
+        router.put(`/modules/${props.moduleId}/items/${props.itemId}`, {
+            data: editableData.value
+        }, {
+            preserveScroll: true,
+            onSuccess: () => {
+                saving.value = false;
+                emit('save', editableData.value);
+            },
+            onError: () => {
+                saving.value = false;
+            }
+        });
+    } else {
+        emit('save', editableData.value);
+    }
 }
 </script>
 
 <style scoped>
-
 </style>
+

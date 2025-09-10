@@ -1,8 +1,9 @@
 {
-    "semi": true,
+    "semi": false,
     "singleQuote": true,
     "singleAttributePerLine": false,
     "htmlWhitespaceSensitivity": "css",
+    "arrowParens":"avoid",
     "printWidth": 150,
     "plugins": ["prettier-plugin-organize-imports", "prettier-plugin-tailwindcss"],
     "tailwindFunctions": ["clsx", "cn", "cva"],

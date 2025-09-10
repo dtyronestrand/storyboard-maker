@@ -1,16 +1,20 @@
 <template>
-    <div class="border rounded-lg p-4 bg-base-100 shadow-sm">
+    <div class=" rounded-lg p-4 bg-base-300 mb-16">
     <div class="flex justify-between items-start">
+    <span class="drag-handle cursor-move mr-4">☰</span>
     <div class="flex-grow">
+      
     <component
     :is="isEditing ? editComponent : viewComponent"
     :item-data="item.data"
+    :module-id="moduleId"
+    :item-id="item.id"
     @save="handleUpdate"
     @cancel="isEditing = false"
     />
     </div>
     <div class="flex items-center ml-4">
-    <span class="drag-handle cursor-move mr-4">☰</span>
+  
     <button @click="isEditing = !isEditing" class="btn btn-sm btn-info mr-2">
         {{ isEditing ? 'View' : 'Edit' }}</button>
     <button @click="handleDelete" class="btn btn-sm btn-error">Delete</button>
@@ -21,16 +25,20 @@
 </template>
 
 <script setup lang="ts">
+import { edit } from '@/routes/courses';
 import {ref, defineAsyncComponent, computed} from 'vue';
 
 const props = defineProps({
     item: Object,
     index: Number,
+    moduleId: Number,
+    forceEdit: {type: Boolean, default: false},
+    edit: {type: Boolean, default: false}
 });
-
+const localEdit = ref(props.forceEdit || props.edit);
 const emit = defineEmits(['update', 'delete']);
 
-const isEditing = ref(false);
+const isEditing = ref(localEdit.value);
 
 const viewComponent = computed(() => defineAsyncComponent(() => import(`./View/${props.item.type.charAt(0).toUpperCase() + props.item.type.slice(1)}View.vue`)));
 

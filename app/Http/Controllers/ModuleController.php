@@ -32,6 +32,8 @@ class ModuleController extends Controller
             'title' => 'required|string|max:255',
             'number' => 'required|integer',
             'objectives' => 'nullable|array',
+            'objectives.*.objective' => 'required|string',
+            'objectives.*.aligned_CLOs' => 'nullable|array',
             'course_id' => 'required|integer',
         ]);
 
@@ -67,6 +69,6 @@ class ModuleController extends Controller
      */
     public function destroy(Module $module)
     {
-        //
+        Module::destroy($module->id);
     }
 }

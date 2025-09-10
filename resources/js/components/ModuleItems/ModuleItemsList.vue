@@ -1,19 +1,18 @@
 <template>
     <div>
-        <draggable v-model="localItems" item-key="id" animation="200" handle=".drag-handle">
+        <draggable class="bg-base-300" v-model="localItems" item-key="id" animation="200" handle=".drag-handle">
          <div v-for ="(item, index) in localItems" :key="item.id" class="mb-4">
-            <ModuleItem :item="item" :index="index" @update="handleUpdateItem" @delete="handleDeleteItem"/>
+            <ModuleItem :item="item" :index="index" :edit="props.edit" :module-id="module.id" :force-edit="item._justAdded" @update="handleUpdateItem" @delete="handleDeleteItem"/>
             </div>
         </draggable>
-        <div class="mt-4">
-        <select @change="e=>handleAddItem(e.target.value)">
-        <option disabled selected>--Add New Item</option>
+        <div class="mt-4" v-if="edit">
+        <select class="border p-2 bg-base-200 border-accent" v-model="selectedType" @change="handleAddItem">
+        <option value="" disabled>--Add New Item--</option>
         <option v-for="type in itemTypes" :key="type.value" :value="type.value">{{type.label}}</option>
         </select>
+        <button class="btn btn-md btn-success ml-4" @click="saveChanges" :disabled="localItems.length === (props.module.items || []).length && localItems.every((item, idx) => item.id === (props.module.items || [])[idx]?.id)">Save Changes</button>
         </div>
-        <div class="mt-8">
-        <button @click="saveChanges" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Save Changes</button>
-        </div>
+    
     </div>
 </template>
 
@@ -26,9 +25,11 @@ import ModuleItem from './ModuleItem.vue';
 
 const props = defineProps({
     module: Object, 
+    edit: {type: Boolean, default: false}
 })
 
 const localItems = ref([...(props.module.items || [])]);
+const selectedType = ref('');
 
 const itemTypes = [
     {value: 'overview', label: 'Overview'},
@@ -63,19 +64,30 @@ function createItemScaffold(type){
     }
     return base;
 }
-function handleAddItem(type){
-    const newItem = createItemScaffold(type);
+function handleAddItem(){
+    if (!selectedType.value) return;
+    
+    const newItem = createItemScaffold(selectedType.value);
+    newItem._justAdded = true; // Flag to force edit mode only for just-added items
     localItems.value.push(newItem);
+    selectedType.value = ''; // Reset dropdown
 }
 function handleUpdateItem(updatedItem){
     const index = localItems.value.findIndex(item => item.id === updatedItem.id);
     if (index !== -1){
+        // Remove the _justAdded flag when item is updated
+        delete updatedItem._justAdded;
         localItems.value[index] = updatedItem;
     }
 }
 
 function handleDeleteItem(itemId){
-    localItems.value = localItems.value.filter(item => item.id !== itemId);
+    router.delete(`/modules/${props.module.id}/items/${itemId}`, {
+        preserveScroll: true,
+        onSuccess: () => {
+            localItems.value = localItems.value.filter(item => item.id !== itemId);
+        }
+    });
 }
 
 function saveChanges(){

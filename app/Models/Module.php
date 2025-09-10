@@ -19,7 +19,7 @@ protected $fillable = [
 
     protected $casts = [
         'objectives' => 'array',
-        'items' => AsArrayObject::class,
+        'items' => 'array',
     ];
 
     public function course(): BelongsTo

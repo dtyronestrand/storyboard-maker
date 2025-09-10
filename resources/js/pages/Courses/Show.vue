@@ -9,37 +9,53 @@
      <h2 class="text-2xl pt-8 mb-4">Modules</h2>
         <ul>
             <span v-if="!editModule && page.props.course.modules.length > 0">
-            <div  v-for="module in page.props.course.modules" :key="module.id" class="border p-4 rounded mb-4">
+            <div  v-for="module in page.props.course.modules" :key="module.id" class=" p-4 rounded mb-4">
                 <h3 class="text-xl pt-4 pb-4">Module {{module.number}} {{ module.title }}</h3>
-                <h4 class="mb-4">Learning Objectives:</h4>
-                <ul v-for="objective in module.objectives" :key="objective.id">
-                    <li>{{ objective }}</li>
-                </ul>
+                <h4 class="text-lg mb-4">Module Objectives:</h4>
+               <div v-for="(objective, index) in module.objectives" :key="index" class=" p-4 rounded mb-4">
+                <ol>
+                <li>{{ objective.objective }} <span v-for="(clo, index) in objective.aligned_CLOs" :key="index">CLOs: {{ index + 1 }}</span></li>
+                </ol>
+            </div>
+            
           <ModuleItemsList :module="module"/>
+          <div class="button-group">
+             <button type="button" @click="editModule=true" class="btn border border-accent btn-md btn-info">Edit Module</button>
+             <button type="button" @click="deleteModule(module)" class="btn border border-accent btn-md btn-error">Delete Module</button>
           </div>
+          </div>
+       
             </span>
             <span v-else>
-            <li v-for="module in page.props.course.modules" :key="module.id">
-                Module <input v-model="module.number" type="number" class="w-16"/>: <input v-model="module.title" type="text" />
-           <ul>
-           <li v-for="(objective, index) in module.objectives" :key="index">
-                <input v-model="module.objectives[index]" type="text" required />
-                <button type="button" @click="module.objectives.splice(index, 1)" class="btn btn-sm btn-error">Remove Objective</button>
-            </li>
-            <button type="button" class="btn btn-sm btn-info" @click="module.objectives.push('')">Add Objective</button>
-           </ul>
-
-           <div class="pt-8">
+            <li v-for="module in page.props.course.modules" class="text-lg" :key="module.id">
+                Module <input v-model="module.number" type="number" class="border pl-2 border-accent w-16"/>: <input v-model="module.title" type="text" />
+             <h4 class="mb-4 mt-8" >Module Objectives:</h4>
+               <div v-for="(objective, index) in module.objectives" :key="index" class=" flex flex-col p-4 rounded mb-4">
+                <label>Objective:</label>
+                <input class="border-b" v-model="module.objectives[index].objective" type="text" required />
+                <label class="mt-2">Aligned CLOs: </label>
+                <p class="text-sm pt-4"><em>Hold Ctrl and click to select multiple.</em></p>
+                <select v-model="module.objectives[index].aligned_CLOs" multiple class="border px-4 pt-2 max-w-[100dvw] [max-content] min-h-[100px]">
+                    <option v-if="!page.props.course?.objectives?.length" disabled>No course objectives available</option>
+                    <option v-for="(clo, cloIndex) in page.props.course?.objectives || []" :key="cloIndex" :value="clo">{{ clo }}</option>
+                </select>
+                <button type="button" class="max-w-[max-content] btn btn-error mt-2" @click="module.objectives.splice(index, 1)">Remove Objective</button>
+            </div>
+            <div class="mb-8">
+            <button type="button" class="btn btn-info" @click="module.objectives.push({objective: '', aligned_CLOs: []})">Add Objective</button>
+            </div> 
+ <ModuleItemsList  :edit="true" :module="module"/>
+           <div class="pt-8 space-x-4">
+           <button type="button" @click="updateModule" class="btn btn-md btn-success">Save Module</button>
            <button type="button" @click="editModule=false" class="btn btn-md btn-error">Cancel</button>
-            <button type="button" @click="updateModule" class="btn btn-md btn-success">Save Module</button>
            </div>
               </li>
 </span>
 
         </ul>
-       <button type="button" @click="addModule" class="btn btn-primary rounded-xl mt-8">Add Module</button>
+       <button type="button" @click="addModule" :course="page.props.course" class="btn btn-primary rounded-xl mt-8">Add Module</button>
     </div>
-    <CreateModuleModal v-if="createModuleModal" @close="createModuleModal=false" @newModule="saveModule"/>
+    <CreateModuleModal v-if="createModuleModal" :course="page.props.course" @close="createModuleModal=false" @newModule="saveModule"/>
     </AppLayout>
 </template>
 
@@ -57,6 +73,27 @@ const editModule = ref(false);
 const addModule = ()=>{
     createModuleModal.value = true;
 }
+const updateModule = ()=>{
+    router.put(`/courses/${page.props.course.id}`, {
+        modules: page.props.course.modules
+    }, {
+        onSuccess: () => {
+            editModule.value = false;
+        },
+        onFinish: () => {
+            router.reload();
+        }
+    });
+}
+const deleteModule = (module) => {
+    if(confirm('Are you sure you want to delete this module? This will also delete all associated items.')){
+        router.delete(`/modules/${module.id}`, {
+            onFinish: () => {
+                router.reload();
+            }
+        });
+    }
+};
 const saveModule = (number: number, title: string, objectives: string[]) => {
     router.post('/modules', {
         course_id: page.props.course.id,
@@ -75,5 +112,9 @@ const saveModule = (number: number, title: string, objectives: string[]) => {
 </script>
 
 <style scoped>
-
+.button-group {
+    width: min-content;
+    display: flex;
+    gap: 0.5rem;
+}
 </style>
