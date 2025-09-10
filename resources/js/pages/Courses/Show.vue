@@ -55,6 +55,12 @@
         </ul>
        <button type="button" @click="addModule" :course="page.props.course" class="btn btn-primary rounded-xl mt-8">Add Module</button>
     </div>
+    <div>
+    <form @submit.prevent="exportToGoogleDocs">
+    @csrf
+    <button type="submit">Export to Google Docs</button>
+</form>
+    </div>
     <CreateModuleModal v-if="createModuleModal" :course="page.props.course" @close="createModuleModal=false" @newModule="saveModule"/>
     </AppLayout>
 </template>
@@ -70,6 +76,18 @@ const page = usePage();
 const createModuleModal = ref(false);
 const editModule = ref(false);
 
+const exportToGoogleDocs = () => {
+    router.post(`/storyboard/export/${page.props.course.id}`, {
+        course_id: page.props.course.id
+    }, {
+        onSuccess: () => {
+            alert('Export initiated. Please check your Google Drive shortly.');
+        },
+        onError: (errors) => {
+            alert('Error exporting to Google Docs: ' + JSON.stringify(errors));
+        }
+    });
+};
 const addModule = ()=>{
     createModuleModal.value = true;
 }
