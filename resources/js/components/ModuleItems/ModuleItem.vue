@@ -1,12 +1,12 @@
 <template>
-    <div class=" rounded-lg p-4 bg-base-300 mb-16">
+    <div class=" rounded-lg p-4 bg-base-200 mt-4 mb-4">
     <div class="flex justify-between items-start">
     <span class="drag-handle cursor-move mr-4">☰</span>
     <div class="flex-grow">
       
     <component
     :is="isEditing ? editComponent : viewComponent"
-    :item-data="item.data"
+    :item-data="item.data || {}"
     :module-id="moduleId"
     :item-id="item.id"
     @save="handleUpdate"
@@ -25,8 +25,8 @@
 </template>
 
 <script setup lang="ts">
-import { edit } from '@/routes/courses';
 import {ref, defineAsyncComponent, computed} from 'vue';
+import {router} from '@inertiajs/vue3';
 
 const props = defineProps({
     item: Object,
@@ -45,8 +45,15 @@ const viewComponent = computed(() => defineAsyncComponent(() => import(`./View/$
 const editComponent = computed(() => defineAsyncComponent(() => import(`./Edit/${props.item.type.charAt(0).toUpperCase() + props.item.type.slice(1)}Edit.vue`)));
 
 function handleUpdate(updatedItemData){
-    emit('update', {...props.item, data: updatedItemData});
-    isEditing.value = false;
+    router.put(`/modules/${props.moduleId}/items/${props.item.id}`, {
+        data: updatedItemData
+    }, {
+        preserveScroll: true,
+        onSuccess: () => {
+            emit('update', {...props.item, data: updatedItemData});
+            isEditing.value = false;
+        }
+    });
 }
 
 function handleDelete(){

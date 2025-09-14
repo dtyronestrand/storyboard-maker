@@ -28,7 +28,31 @@ const props = defineProps({
     edit: {type: Boolean, default: false}
 })
 
-const localItems = ref([...(props.module.items || [])]);
+// Handle both new ModuleItem structure and legacy JSON structure
+const getItemsArray = () => {
+    if (props.module.module_items && props.module.module_items.length > 0) {
+        // New structure: convert ModuleItem objects to legacy format for compatibility
+        return props.module.module_items.map(item => ({
+            id: item.id,
+            type: item.type,
+            data: {
+                title: item.title,
+                ...item.data,
+                // Add quiz questions back to data for compatibility
+                ...(item.quiz_questions ? { questions: item.quiz_questions.map(q => ({
+                    question: q.question_text,
+                    type: q.question_type,
+                    options: q.options,
+                    correct_answer: q.correct_answer,
+                    points: q.points
+                })) } : {})
+            }
+        }));
+    }
+    return props.module.items || [];
+};
+
+const localItems = ref([...getItemsArray()]);
 const selectedType = ref('');
 
 const itemTypes = [

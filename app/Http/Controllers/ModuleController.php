@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Module;
+use App\Models\ModuleItem;
 use Illuminate\Http\Request;
 
 class ModuleController extends Controller
@@ -61,7 +62,15 @@ class ModuleController extends Controller
      */
     public function update(Request $request, Module $module)
     {
-        //
+      $validated = $request->validate([
+            'id' => 'required|integer',
+            'title' => 'required|string|max:255',
+            'number' => 'required|integer',
+            'objectives' => 'nullable|array',
+            'items' => 'nullable|array',
+        ]);
+
+        $module->update($validated);
     }
 
     /**

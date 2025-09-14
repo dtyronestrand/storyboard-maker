@@ -90,7 +90,10 @@ class CourseController extends Controller
      */
     public function update(Request $request, Course $course)
     {
-        //
+        
+        
+
+
     }
 
     /**

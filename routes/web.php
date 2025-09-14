@@ -16,6 +16,8 @@ Route::resource('courses', CourseController::class)->middleware(['auth', 'verifi
 
 Route::resource('modules', ModuleController::class)->middleware(['auth', 'verified']);
 
+Route::post('modules/{module}/items', [ModuleItemController::class, 'store'])->middleware(['auth', 'verified'])->name('modules.items.store');
+
 Route::put('modules/{module}/items', [ModuleItemController::class, 'update'])->middleware(['auth', 'verified'])->name('modules.items.update');
 
 Route::put('modules/{module}/items/{itemId}', [ModuleItemController::class, 'updateItem'])->middleware(['auth', 'verified'])->name('modules.items.updateItem');

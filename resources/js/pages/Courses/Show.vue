@@ -1,7 +1,9 @@
 <template>
     <AppLayout>
     <div>
-     <h1 class="text-5xl pt-8" >{{page.props.course.prefix}} {{ page.props.course.number }} {{ page.props.course.name }}</h1>
+     <h1 class="text-5xl pt-8" >{{page.props.course.prefix}} {{ page.props.course.number }} 
+     <br/>
+     {{ page.props.course.name }}</h1>
      <h2 class="text-2xl pt-8 mb-4">Course Objectives</h2>
         <ul>
             <li v-for="objective in page.props.course.objectives" :key="objective.id">{{ objective}}</li>
@@ -10,17 +12,24 @@
         <ul>
             <span v-if="!editModule && page.props.course.modules.length > 0">
             <div  v-for="module in page.props.course.modules" :key="module.id" class=" p-4 rounded mb-4">
-                <h3 class="text-xl pt-4 pb-4">Module {{module.number}} {{ module.title }}</h3>
+                <h3 class="text-xl pt-4 pb-4  pl-4 border-2 border-accent bg-primary text-primary-content">Module {{module.number}} {{ module.title }}</h3>
+                <div class="p-4 border-2 border-accent bg-secondary text-secondary-content">
                 <h4 class="text-lg mb-4">Module Objectives:</h4>
-               <div v-for="(objective, index) in module.objectives" :key="index" class=" p-4 rounded mb-4">
-                <ol>
-                <li>{{ objective.objective }} <span v-for="(clo, index) in objective.aligned_CLOs" :key="index">CLOs: {{ index + 1 }}</span></li>
-                </ol>
-            </div>
+               <div v-if="module.objectives && module.objectives.length > 0">
+                   <div v-for="(objective, index) in module.objectives" :key="index" class=" p-4 rounded mb-4">
+                    <ol>
+                    <li>{{ typeof objective === 'string' ? objective : objective.objective }} <span v-if="objective.aligned_CLOs" v-for="(clo, cloIndex) in objective.aligned_CLOs" :key="cloIndex">CLO: {{ cloIndex + 1 }}</span></li>
+                    </ol>
+                </div>
+               </div>
+               <div v-else>
+                   <p class="text-gray-500">No objectives defined</p>
+                </div>
+               </div>
             
           <ModuleItemsList :module="module"/>
           <div class="button-group">
-             <button type="button" @click="editModule=true" class="btn border border-accent btn-md btn-info">Edit Module</button>
+             <button type="button" @click="editModule=true; convertObjectivesToObjects()" class="btn border border-accent btn-md btn-info">Edit Module</button>
              <button type="button" @click="deleteModule(module)" class="btn border border-accent btn-md btn-error">Delete Module</button>
           </div>
           </div>
@@ -30,7 +39,7 @@
             <li v-for="module in page.props.course.modules" class="text-lg" :key="module.id">
                 Module <input v-model="module.number" type="number" class="border pl-2 border-accent w-16"/>: <input v-model="module.title" type="text" />
              <h4 class="mb-4 mt-8" >Module Objectives:</h4>
-               <div v-for="(objective, index) in module.objectives" :key="index" class=" flex flex-col p-4 rounded mb-4">
+               <div v-for="(objective, index) in (module.objectives || [])" :key="index" class=" flex flex-col p-4 rounded mb-4">
                 <label>Objective:</label>
                 <input class="border-b" v-model="module.objectives[index].objective" type="text" required />
                 <label class="mt-2">Aligned CLOs: </label>
@@ -42,11 +51,11 @@
                 <button type="button" class="max-w-[max-content] btn btn-error mt-2" @click="module.objectives.splice(index, 1)">Remove Objective</button>
             </div>
             <div class="mb-8">
-            <button type="button" class="btn btn-info" @click="module.objectives.push({objective: '', aligned_CLOs: []})">Add Objective</button>
+            <button type="button" class="btn btn-info" @click="(module.objectives = module.objectives || []).push({objective: '', aligned_CLOs: []})">Add Objective</button>
             </div> 
  <ModuleItemsList  :edit="true" :module="module"/>
            <div class="pt-8 space-x-4">
-           <button type="button" @click="updateModule" class="btn btn-md btn-success">Save Module</button>
+           <button type="button" @click="updateModule()" class="btn btn-md btn-success">Save Module</button>
            <button type="button" @click="editModule=false" class="btn btn-md btn-error">Cancel</button>
            </div>
               </li>
@@ -57,8 +66,7 @@
     </div>
     <div>
     <form @submit.prevent="exportToGoogleDocs">
-    @csrf
-    <button type="submit">Export to Google Docs</button>
+    <button class="btn btn-info mt-12" type="submit">Export to Google Docs</button>
 </form>
     </div>
     <CreateModuleModal v-if="createModuleModal" :course="page.props.course" @close="createModuleModal=false" @newModule="saveModule"/>
@@ -124,6 +132,26 @@ const saveModule = (number: number, title: string, objectives: string[]) => {
         },
         onFinish: () => {
             router.reload();
+        }
+    });
+};
+
+const convertObjectivesToObjects = () => {
+    page.props.course.modules.forEach(module => {
+        if (module.objectives) {
+            module.objectives = module.objectives.map(obj => 
+                typeof obj === 'string' ? { objective: obj, aligned_CLOs: [] } : obj
+            );
+        }
+    });
+};
+
+const convertObjectivesToStrings = () => {
+    page.props.course.modules.forEach(module => {
+        if (module.objectives) {
+            module.objectives = module.objectives.map(obj => 
+                typeof obj === 'object' ? obj.objective : obj
+            );
         }
     });
 };

@@ -1,5 +1,5 @@
 <template>
-    <div class="bg-base-300 space-y-4">
+    <div class="bg-base-200 p-8 space-y-4">
         <h3 class="text-lg font-semibold">{{ itemData.title }}</h3>
         <div v-html="itemData.content" class="prose"></div>
         <div v-if="itemData.learning_objectives && itemData.learning_objectives.length">
