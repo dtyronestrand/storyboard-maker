@@ -14,6 +14,7 @@ class ModuleItem extends Model
         'title',
         'position',
         'data',
+        'rubric_id',
     ];
 
     protected $casts = [
@@ -28,6 +29,11 @@ class ModuleItem extends Model
     public function quizQuestions(): HasMany
     {
         return $this->hasMany(QuizQuestion::class)->orderBy('position');
+    }
+
+    public function rubric(): BelongsTo
+    {
+        return $this->belongsTo(Rubric::class);
     }
 
     public function scopeOrdered($query)
