@@ -5,6 +5,7 @@ use Inertia\Inertia;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\ModuleController;
 use App\Http\Controllers\ModuleItemController;
+use App\Http\Controllers\RubricController;
 
 Route::get('/', function () {
     return Inertia::render('Welcome');
@@ -15,6 +16,8 @@ Route::get('dashboard', [CourseController::class, 'index'])->middleware(['auth',
 Route::resource('courses', CourseController::class)->middleware(['auth', 'verified']);
 
 Route::resource('modules', ModuleController::class)->middleware(['auth', 'verified']);
+
+Route::resource('rubrics', RubricController::class)->middleware(['auth', 'verified']);
 
 Route::post('modules/{module}/items', [ModuleItemController::class, 'store'])->middleware(['auth', 'verified'])->name('modules.items.store');
 
