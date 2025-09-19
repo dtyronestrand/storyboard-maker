@@ -1,4 +1,5 @@
 <template>
+    <AppLayout>
     <div>
         <h1 class="text-2xl font-bold mb-4">Rubrics</h1>
         <table class="table-auto w-full border-collapse border border-accent">
@@ -21,10 +22,33 @@
         </table>
         <button @click="createRubric" class="btn btn-primary mt-4">Create New Rubric</button>
     </div>
+    </AppLayout>
 </template>
 
 <script setup lang="ts">
-const 
+import { router } from '@inertiajs/vue3';
+import AppLayout from '@/layouts/AppLayout.vue'; 
+defineProps<{
+    rubrics: Array<any>
+}>()
+
+function createRubric() {
+    router.get('/rubrics/create');
+}
+
+function viewRubric(id: number) {
+    router.get(`/rubrics/${id}`);
+}
+
+function editRubric(id: number) {
+    router.get(`/rubrics/${id}/edit`);
+}
+
+function deleteRubric(id: number) {
+    if (confirm('Are you sure you want to delete this rubric?')) {
+        router.delete(`/rubrics/${id}`);
+    }
+}
 </script>
 
 <style scoped>

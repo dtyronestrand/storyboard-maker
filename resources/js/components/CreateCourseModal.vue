@@ -16,7 +16,7 @@
             </div>
             <button type="button" @click="objectives.push('')">Add Objective</button> 
             <button type="submit">Create Course</button>
-            <button type="button" @click="$emit('close')">Cancel</button>
+            <button type="button" @click="emits('close')">Cancel</button>
         </form>
         </div>
     </div>

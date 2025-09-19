@@ -1,8 +1,8 @@
 <template>
-    <div class="space-y-4 bg-base-300">
+    <div class="space-y-4 p-8 bg-base-200">
     <div>
     <label>Title</label>
-    <input type="text" v-model="editableData.title" class="w-full border border-accent bg-base-100 p-2 rounded"/>
+    <input type="text" v-model="editableData.title" class="w-full border-2 border-primary bg-base-300 p-2 rounded"/>
     </div>
     <div>
     <label>Content</label>

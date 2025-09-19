@@ -17,7 +17,7 @@ Route::resource('courses', CourseController::class)->middleware(['auth', 'verifi
 
 Route::resource('modules', ModuleController::class)->middleware(['auth', 'verified']);
 
-Route::resource('rubrics', RubricController::class)->middleware(['auth', 'verified']);
+Route::resource('rubrics', RubricController::class)->names(['index' => 'rubrics'])->middleware(['auth', 'verified']);
 
 Route::post('modules/{module}/items', [ModuleItemController::class, 'store'])->middleware(['auth', 'verified'])->name('modules.items.store');
 

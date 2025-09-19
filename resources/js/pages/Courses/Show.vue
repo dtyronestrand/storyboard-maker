@@ -11,7 +11,7 @@
      <h2 class="text-2xl pt-8 mb-4">Modules</h2>
         <ul>
             <span v-if="!editModule && page.props.course.modules.length > 0">
-            <div  v-for="module in page.props.course.modules" :key="module.id" class=" p-4 rounded mb-4">
+            <div  v-for="module in page.props.course.modules" :key="module.id" class=" rounded mb-4">
                 <h3 class="text-xl pt-4 pb-4  pl-4 border-2 border-accent bg-primary text-primary-content">Module {{module.number}} {{ module.title }}</h3>
                 <div class="p-4 border-2 border-accent bg-secondary text-secondary-content">
                 <h4 class="text-lg mb-4">Module Objectives:</h4>

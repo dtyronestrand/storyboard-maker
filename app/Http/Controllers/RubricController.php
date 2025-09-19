@@ -37,14 +37,20 @@ class RubricController extends Controller
             'performance_levels' => 'required|array|min:1',
             'performance_levels.*' => 'string|max:255',
             'criteria' => 'required|array|min:1',
-            'criteria.*' => 'string|max:255',
+            'criteria.*.name' => 'required|string|max:255',
+            'criteria.*.description' => 'required|string',
+            'criteria.*.level_descriptions' => 'required|array',
+            'criteria.*.level_points' => 'required|array',
         ]);
 
-        $rubric = new Rubric();
-        $rubric->title = $request->input('title');
-        $rubric->performance_levels = $request->input('performance_levels');
-        $rubric->criteria = $request->input('criteria');
-        $rubric->save();
+        Rubric::create([
+            'title' => $request->input('title'),
+            'performance_levels' => $request->input('performance_levels'),
+            'criteria' => $request->input('criteria'),
+        ]);
+
+        return redirect()->route('rubrics.index');
+
     }
 
     /**
@@ -52,7 +58,7 @@ class RubricController extends Controller
      */
     public function show(Rubric $rubric)
     {
-        //
+        return Inertia::render('Rubrics/Show', compact('rubric'));
     }
 
     /**
@@ -60,7 +66,7 @@ class RubricController extends Controller
      */
     public function edit(Rubric $rubric)
     {
-        //
+        return Inertia::render('Rubrics/Edit', compact('rubric'));
     }
 
     /**
@@ -68,7 +74,20 @@ class RubricController extends Controller
      */
     public function update(Request $request, Rubric $rubric)
     {
-        //
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'performance_levels' => 'required|array|min:1',
+            'performance_levels.*' => 'string|max:255',
+            'criteria' => 'required|array|min:1',
+            'criteria.*.name' => 'required|string|max:255',
+            'criteria.*.description' => 'required|string',
+            'criteria.*.level_descriptions' => 'required|array',
+            'criteria.*.level_points' => 'required|array',
+        ]);
+
+        $rubric->update($request->all());
+
+        return redirect()->route('rubrics.index');
     }
 
     /**
@@ -76,6 +95,8 @@ class RubricController extends Controller
      */
     public function destroy(Rubric $rubric)
     {
-        //
+        $rubric->delete();
+
+        return redirect()->route('rubrics.index');
     }
 }
