@@ -1,7 +1,7 @@
 <template>
     <AppLayout :breadcrumbs="breadcrumbs">
     <div>
-     <h1 class="text-5xl pt-8" >{{page.props.course.prefix}} {{ page.props.course.number }} 
+     <h1 class="text-5xl pt-8" >{{page.props.course.prefix.toUpperCase()}} {{ page.props.course.number }} 
      <br/>
      {{ page.props.course.name }}</h1>
      <h2 class="text-2xl pt-8 mb-4">Course Objectives</h2>

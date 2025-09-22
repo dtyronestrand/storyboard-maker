@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import AppLayout from '@/layouts/AppLayout.vue';
 import { dashboard } from '@/routes';
-import { show as courseShow } from '@/routes/courses';
+
 import { type BreadcrumbItem } from '@/types';
 import { Head, usePage, Link, router } from '@inertiajs/vue3';
 import { ref } from 'vue';
@@ -57,10 +57,10 @@ const newCourse = (prefix, number, name, objectives) => {
          </thead>
          <tbody>
          <tr v-for="course in page.props.courses" :key="course.id" class="hover:bg-accent/50">
-            <td>{{ course.prefix }}</td>
+            <td>{{ course.prefix.toUpperCase()}}</td>
             <td>{{ course.number }}</td>
             <td>{{ course.name }}</td>
-            <td><Link :href="courseShow.url(course.id)" class="rounded-sm bg-info px-2 py-1 text-sm text-info-content hover:bg-primary-dark">View Course</Link></td>
+            <td><Link :href="`/courses/${course.id}`" class="rounded-sm bg-info px-2 py-1 text-sm text-info-content hover:bg-primary-dark">View Course</Link></td>
          </tr>
          </tbody>
          </table>
