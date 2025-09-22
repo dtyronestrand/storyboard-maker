@@ -1,12 +1,12 @@
 <template>
-    <AppLayout>
+    <AppLayout :breadcrumbs="breadcrumbs">
     <div>
         <h1 class="text-2xl font-bold mb-4">Rubrics</h1>
         <table class="table-auto w-full border-collapse border border-accent">
             <thead>
                 <tr>
-                    <th class="border border-accent bg-base-200 p-2">Title</th>
-                    <th class="border border-accent bg-base-200 p-2">Actions</th>
+                    <th class="border border-accent bg-primary text-primary-content">Title</th>
+                    <th class="border border-accent bg-primary text-primary-content p-2">Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -20,7 +20,7 @@
                 </tr>
             </tbody>
         </table>
-        <button @click="createRubric" class="btn btn-primary mt-4">Create New Rubric</button>
+        <button @click="createRubric" class="btn text-info-content btn-info mt-4">Create New Rubric</button>
     </div>
     </AppLayout>
 </template>
@@ -28,6 +28,13 @@
 <script setup lang="ts">
 import { router } from '@inertiajs/vue3';
 import AppLayout from '@/layouts/AppLayout.vue'; 
+import {rubrics as rubricsIndeex} from '@/routes';
+import {type BreadcrumbItem} from '@/types';
+
+const breadcrumbs: BreadcrumbItem[] = [
+    {title: 'Dashboard', href: '/dashboard'},
+    {title: 'Rubrics', href: rubricsIndeex().url}
+]
 defineProps<{
     rubrics: Array<any>
 }>()

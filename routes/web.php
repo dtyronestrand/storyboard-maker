@@ -13,7 +13,7 @@ Route::get('/', function () {
 
 Route::get('dashboard', [CourseController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
 
-Route::resource('courses', CourseController::class)->middleware(['auth', 'verified']);
+Route::resource('courses', CourseController::class)->names(['show' => 'courseShow'])->middleware(['auth', 'verified']);
 
 Route::resource('modules', ModuleController::class)->middleware(['auth', 'verified']);
 

@@ -1,4 +1,5 @@
 <template>
+    <AppLayout :breadcrumbs="breadcrumbs">
     <div>
         <h1 class="text-2xl font-bold mb-4">{{ rubric.title }}</h1>
         <table class="table-auto w-full border-collapse border border-accent">
@@ -22,12 +23,24 @@
             </tbody>
         </table>
     </div>
+    </AppLayout>
 </template>
 
 <script setup lang="ts">
-defineProps<{
+import {type BreadcrumbItem} from '@/types';
+import {rubrics as rubricsIndex} from '@/routes';
+import AppLayout from '@/layouts/AppLayout.vue'; 
+const { rubric } = defineProps<{
     rubric: any
 }>()
+
+
+const breadcrumbs: BreadcrumbItem = [
+    {title: 'Dashboard', href: '/dashboard'},
+    {title: 'Rubrics', href: rubricsIndex().url},
+    {title: rubric.title, href: `/rubrics/${rubric.id}`}
+]
+
 </script>
 
 <style scoped>

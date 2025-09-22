@@ -1,5 +1,5 @@
 <template>
-    <div class="space-y-4">
+   <div class="bg-base-200 p-8 space-y-4">
         <h3 class="text-lg font-semibold">{{ itemData.title }}</h3>
         <div v-if="itemData.purpose">
             <h4 class="font-medium">Purpose:</h4>

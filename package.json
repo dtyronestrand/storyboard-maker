@@ -37,6 +37,7 @@
         "@fontsource-variable/inter": "^5.2.6",
         "@fontsource-variable/space-grotesk": "^5.2.8",
         "@inertiajs/vue3": "^2.1.0",
+        "@tanstack/vue-table": "^8.21.3",
         "@tiptap/extension-list": "^3.4.1",
         "@tiptap/pm": "^3.4.1",
         "@tiptap/starter-kit": "^3.4.1",

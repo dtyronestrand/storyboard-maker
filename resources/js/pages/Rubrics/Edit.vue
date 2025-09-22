@@ -1,4 +1,5 @@
 <template>
+    <AppLayout :breadcrumbs="breadcrumbs">
     <div>
         <h1 class="text-2xl font-bold mb-4">Edit Rubric</h1>
         <form @submit.prevent="updateRubric" class="space-y-6">
@@ -50,16 +51,24 @@
             <button type="submit" class="btn btn-primary">Save Changes</button>
         </form>
     </div>
+    </AppLayout>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue';
 import { router } from '@inertiajs/vue3';
-
+import {type BreadcrumbItem} from '@/types';
+import {rubrics as rubricsIndex} from '@/routes';
+import AppLayout from '@/layouts/AppLayout.vue'; 
 const props = defineProps<{
     rubric: any;
 }>();
-
+const breadcrumbs: BreadcrumbItem = [
+    {title: 'Dashboard', href: '/dashboard'},
+    {title: 'Rubrics', href: rubricsIndex().url},
+    {title: props.rubric.title, href: `/rubrics/${props.rubric.id}`},
+    {title: 'Edit', href: `/rubrics/${props.rubric.id}/edit`},
+]
 // Use ref to create a reactive copy of the rubric prop for editing.
 const form = ref({
     title: props.rubric.title,

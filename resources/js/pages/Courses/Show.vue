@@ -1,5 +1,5 @@
 <template>
-    <AppLayout>
+    <AppLayout :breadcrumbs="breadcrumbs">
     <div>
      <h1 class="text-5xl pt-8" >{{page.props.course.prefix}} {{ page.props.course.number }} 
      <br/>
@@ -36,15 +36,18 @@
        
             </span>
             <span v-else>
-            <li v-for="module in page.props.course.modules" class="text-lg" :key="module.id">
-                Module <input v-model="module.number" type="number" class="border pl-2 border-accent w-16"/>: <input v-model="module.title" type="text" />
+            <li v-for="module in page.props.course.modules" :key="module.id" >
+                <h3 class="text-xl pt-4 pb-4  pl-4  border-2 border-accent bg-primary text-primary-content">
+                Module <input v-model="module.number" type="number" class="border bg-base-300 text-base-content pl-2 border-accent w-16"/>: <input v-model="module.title" type="text"  class="border pl-4 bg-base-300 text-base-content border-accent w-64"  />
+                </h3>
+                <div class="p-4 border-2 border-accent bg-secondary text-secondary-content">
              <h4 class="mb-4 mt-8" >Module Objectives:</h4>
                <div v-for="(objective, index) in (module.objectives || [])" :key="index" class=" flex flex-col p-4 rounded mb-4">
                 <label>Objective:</label>
-                <input class="border-b" v-model="module.objectives[index].objective" type="text" required />
-                <label class="mt-2">Aligned CLOs: </label>
-                <p class="text-sm pt-4"><em>Hold Ctrl and click to select multiple.</em></p>
-                <select v-model="module.objectives[index].aligned_CLOs" multiple class="border px-4 pt-2 max-w-[100dvw] [max-content] min-h-[100px]">
+                <input class="border-b bg-base-300 pl-4 text-base-content" v-model="module.objectives[index].objective" type="text" required />
+                <label class="mt-8">Aligned CLOs: </label>
+                <p class="text-sm pt-1"><em>Hold Ctrl and click to select multiple.</em></p>
+                <select v-model="module.objectives[index].aligned_CLOs" multiple class="bg-base-300 text-base-content border px-4 pt-2 max-w-[100dvw] [max-content] min-h-[100px]">
                     <option v-if="!page.props.course?.objectives?.length" disabled>No course objectives available</option>
                     <option v-for="(clo, cloIndex) in page.props.course?.objectives || []" :key="cloIndex" :value="clo">{{ clo }}</option>
                 </select>
@@ -53,8 +56,9 @@
             <div class="mb-8">
             <button type="button" class="btn btn-info" @click="(module.objectives = module.objectives || []).push({objective: '', aligned_CLOs: []})">Add Objective</button>
             </div> 
+                </div>
  <ModuleItemsList  :edit="true" :module="module"/>
-           <div class="pt-8 space-x-4">
+           <div class="pt-8 pb-16 space-x-4">
            <button type="button" @click="updateModule()" class="btn btn-md btn-success">Save Module</button>
            <button type="button" @click="editModule=false" class="btn btn-md btn-error">Cancel</button>
            </div>
@@ -79,10 +83,17 @@ import AppLayout from '@/layouts/AppLayout.vue';
 import {ref} from "vue";
 import CreateModuleModal from '@/components/CreateModuleModal.vue';
 import ModuleItemsList from '@/components/ModuleItems/ModuleItemsList.vue';
+import {type BreadcrumbItem} from '@/types';
+import {dashboard, courseShow} from '@/routes';
+
 
 const page = usePage();
 const createModuleModal = ref(false);
 const editModule = ref(false);
+const breadcrumbs: BreadcrumbItem[] = [
+    {title: 'Dashboard', href: dashboard().url},
+    {title: page.props.course.prefix + ' ' + page.props.course.number, href: courseShow(page.props.course.id).url}
+]
 
 const exportToGoogleDocs = () => {
     router.post(`/storyboard/export/${page.props.course.id}`, {

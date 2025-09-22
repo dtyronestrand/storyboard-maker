@@ -50,7 +50,7 @@ const editor = useEditor({
     extensions: [StarterKit],
     editorProps: {
         attributes: {
-            class: 'bg-base-100 border border-accent rounded p-2 min-h-[150px] prose prose-sm sm:prose lg:prose-lg xl:prose-2xl mx-auto focus:outline-none',
+            class: 'bg-base-300 border border-accent rounded p-2 min-h-[150px] prose prose-sm sm:prose lg:prose-lg xl:prose-2xl mx-auto focus:outline-none',
         },
     },
   content: props.modelValue,

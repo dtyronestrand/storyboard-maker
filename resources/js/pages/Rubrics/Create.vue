@@ -1,5 +1,5 @@
 <template>
-    <AppLayout>
+    <AppLayout :breadcrumbs="breadcrumbs">
     <div>
         <h1 class="text-2xl font-bold mb-4">Create Rubric</h1>
         <form @submit.prevent="createRubric" class="space-y-6">
@@ -60,8 +60,14 @@
 import { ref } from 'vue';
 import { router } from '@inertiajs/vue3';
 import AppLayout from '@/layouts/AppLayout.vue';
+import {type BreadcrumbItem} from '@/types';
+import {rubrics as rubricsIndex} from '@/routes';
 
-
+const breadcrumbs: BreadcrumbItem[] = [
+    {title: 'Dashboard', href: '/dashboard'},
+    {title: 'Rubrics', href: rubricsIndex().url},
+    {title: 'Create Rubric', href: '/rubrics/create'},
+]
 // The main form object that holds all the rubric data.
 const form = ref({
     title: '',
