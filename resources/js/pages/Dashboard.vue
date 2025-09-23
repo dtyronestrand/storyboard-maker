@@ -4,9 +4,69 @@ import { dashboard } from '@/routes';
 
 import { type BreadcrumbItem } from '@/types';
 import { Head, usePage, Link, router } from '@inertiajs/vue3';
-import { ref } from 'vue';
+import { ref , h} from 'vue';
 import CreateCourseModal from '@/components/CreateCourseModal.vue';
+import {
+    useVueTable,
+    FlexRender,
+    getCoreRowModel,
+    getSortedRowModel,
+} from '@tanstack/vue-table';
+import ViewButton from '@/components/Courses/ViewButton.vue';
 
+interface Props{
+    courses:{
+        id: string,
+        prefix: string,
+        number: number,
+        name: string, 
+        objectives: string[],
+    }[]
+}
+const page = usePage();
+const props = defineProps<Props>();
+const sorting = ref([])
+const data = ref(props.courses)
+const columnsCourses = [
+    {
+        accessorKey: 'prefix',
+        header: 'Prefix',
+        cell: info => info.getValue().toUpperCase()
+    },
+    {
+        accessorKey: 'number',
+        header: 'Number',
+        enableSorting: false,
+    },
+    {
+        accessorKey: 'name',
+        header: 'Name',
+        enableSorting: false,
+    },
+    {
+        accessorKey: 'actions',
+        header: '',
+        cell: ({row}) => h(ViewButton, {courseId: row.original.id}),
+        enableSorting: false,
+    },
+]
+const table = useVueTable({
+data: data.value,
+columns: columnsCourses,
+getCoreRowModel: getCoreRowModel(),
+getSortedRowModel: getSortedRowModel(),
+state: {
+    get sorting() {
+        return sorting.value;
+    },
+},
+onSortingChange: updaterOrValue => {
+    sorting.value =
+        typeof updaterOrValue === 'function'
+            ? updaterOrValue(sorting.value)
+            : updaterOrValue;
+},
+})
 
 const showCreateCourseModal = ref(false);
 
@@ -16,7 +76,7 @@ const breadcrumbs: BreadcrumbItem[] = [
         href: dashboard().url,
     },
 ];
-const page = usePage();
+
 
 const createCourse = () => {
     showCreateCourseModal.value = true;
@@ -48,21 +108,21 @@ const newCourse = (prefix, number, name, objectives) => {
          <div class="bg-base-100 w-full overflow-x-auto mb-[20px] shadow-[0 2px 4px rgba(0,0,0,0.1)]">
          <table class="min-w-[600px] w-full border-collapse">
          <thead>
-         <tr>
-         <th data-column="0">Prefix<i-flowbite-caret-sort-solid class="icon"></i-flowbite-caret-sort-solid></th>
-         <th data-column="1">Number<i-flowbite-caret-sort-solid class="icon"></i-flowbite-caret-sort-solid></th>
-         <th data-column="2">Name<i-flowbite-caret-sort-solid class="icon"></i-flowbite-caret-sort-solid></th>
-            <th data-column="3"></th>
+         <tr v-for="headerGroup in table.getHeaderGroups()" :key="headerGroup.id">
+         <th @click="header.column.getToggleSortingHandler()?.($event)" v-for="header in headerGroup.headers" :key="header.id" scope="col">
+         <FlexRender :render="header.column.columnDef.header" :props="header.getContext()"/>
+         </th>
          </tr>
          </thead>
-         <tbody>
-         <tr v-for="course in page.props.courses" :key="course.id" class="hover:bg-accent/50">
-            <td>{{ course.prefix.toUpperCase()}}</td>
-            <td>{{ course.number }}</td>
-            <td>{{ course.name }}</td>
-            <td><Link :href="`/courses/${course.id}`" class="rounded-sm bg-info px-2 py-1 text-sm text-info-content hover:bg-primary-dark">View Course</Link></td>
-         </tr>
-         </tbody>
+    <tbody>
+    <tr v-for="row in table.getRowModel().rows" :key="row.id" class="hover:bg-accent/50">
+    <td v-for="cell in row.getVisibleCells()" :key="cell.id">
+    <FlexRender :render="cell.column.columnDef.cell" :props="cell.getContext()"/>
+    
+    </td>
+    </tr>
+    </tbody>
+
          </table>
          </div>
 

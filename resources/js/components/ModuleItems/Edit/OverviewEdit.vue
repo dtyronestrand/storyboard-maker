@@ -6,9 +6,9 @@
     </div>
     <div>
     <label>Content</label>
-    <div class="border border-accent rounded">
+   
 <TipTap v-model="editableData.content"/>
-    </div>
+  
     </div>
 
     
